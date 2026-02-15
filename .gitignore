@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Zip files
+*.zip
+
+# Build outputs
+dist/
+build/
+
+# Environment files (keep .env with defaults, ignore local overrides)
+.env.local
+.env.*.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
