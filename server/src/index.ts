@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,7 +17,31 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+app.use('/uploads', express.static(uploadsDir));
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadsDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${uuidv4()}${ext}`);
+  },
+});
+
+const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+const upload = multer({
+  storage,
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PNG, JPG, and PDF files are allowed'));
+    }
+  },
+});
 
 // Types
 interface Report {
@@ -29,6 +54,7 @@ interface Report {
   createdAt: number;
   approvedAt?: number;
   attachmentUrl: string;
+  attachmentFilename?: string;
 }
 
 interface UserStatusEntry {
@@ -46,7 +72,7 @@ const reports: Report[] = [
     contactName: 'Alice Johnson',
     contactEmail: 'alice@example.com',
     status: 'NEW',
-    createdAt: Date.now() - 86400000 * 3, // 3 days ago
+    createdAt: Date.now() - 86400000 * 3,
     attachmentUrl: '/uploads/placeholder.txt'
   },
   {
@@ -56,8 +82,8 @@ const reports: Report[] = [
     contactName: 'Bob Smith',
     contactEmail: 'bob@example.com',
     status: 'APPROVED',
-    createdAt: Date.now() - 86400000 * 5, // 5 days ago
-    approvedAt: Date.now() - 86400000 * 2, // 2 days ago
+    createdAt: Date.now() - 86400000 * 5,
+    approvedAt: Date.now() - 86400000 * 2,
     attachmentUrl: '/uploads/placeholder.txt'
   },
   {
@@ -67,8 +93,8 @@ const reports: Report[] = [
     contactName: 'Carol Davis',
     contactEmail: 'carol@example.com',
     status: 'RESOLVED',
-    createdAt: Date.now() - 86400000 * 7, // 7 days ago
-    approvedAt: Date.now() - 86400000 * 4, // 4 days ago
+    createdAt: Date.now() - 86400000 * 7,
+    approvedAt: Date.now() - 86400000 * 4,
     attachmentUrl: '/uploads/placeholder.txt'
   }
 ];
@@ -86,9 +112,15 @@ app.get('/api/reports', (_req: Request, res: Response) => {
   res.json(reports);
 });
 
-// POST /api/reports - Create a new report
-app.post('/api/reports', (req: Request, res: Response) => {
+// POST /api/reports - Create a new report (multipart/form-data)
+app.post('/api/reports', upload.single('attachment'), (req: Request, res: Response) => {
   const { issueType, description, contactName, contactEmail } = req.body;
+
+  const attachmentUrl = req.file
+    ? `/uploads/${req.file.filename}`
+    : '/uploads/placeholder.txt';
+
+  const attachmentFilename = req.file?.originalname;
 
   const newReport: Report = {
     id: uuidv4(),
@@ -98,11 +130,63 @@ app.post('/api/reports', (req: Request, res: Response) => {
     contactEmail: contactEmail || '',
     status: 'NEW',
     createdAt: Date.now(),
-    attachmentUrl: '/uploads/placeholder.txt'
+    attachmentUrl,
+    ...(attachmentFilename && { attachmentFilename }),
   };
 
   reports.push(newReport);
   res.status(201).json(newReport);
+});
+
+// POST /api/reports/:id/status - Update report status (Approve / Resolve)
+app.post('/api/reports/:id/status', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body as { status?: string };
+
+  const validStatuses = ['APPROVED', 'RESOLVED'] as const;
+  if (!status || !validStatuses.includes(status as typeof validStatuses[number])) {
+    res.status(400).json({ error: 'Status must be APPROVED or RESOLVED' });
+    return;
+  }
+
+  const report = reports.find((r) => r.id === id);
+  if (!report) {
+    res.status(404).json({ error: 'Report not found' });
+    return;
+  }
+
+  report.status = status as Report['status'];
+  if (status === 'APPROVED') {
+    report.approvedAt = Date.now();
+  }
+
+  res.json(report);
+});
+
+// POST /api/check-status - Check user authentication status
+app.post('/api/check-status', (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  if (!email || typeof email !== 'string') {
+    res.status(400).json({ error: 'Email is required' });
+    return;
+  }
+
+  const entry = userStatuses.find(
+    (u) => u.email.toLowerCase() === email.toLowerCase()
+  );
+
+  if (!entry) {
+    res.json({ status: 'allowed' });
+    return;
+  }
+
+  if (entry.status === 'blacklisted') {
+    res.json({ status: 'blacklisted', reason: entry.reason });
+    return;
+  }
+
+  res.json({ status: entry.status });
 });
 
 // Health check
