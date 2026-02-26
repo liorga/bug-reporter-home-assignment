@@ -71,7 +71,7 @@ const ReportRow = React.memo(function ReportRow({
           </button>
         )}
         {report.status === 'RESOLVED' && (
-          <span className="text-muted">Done</span>
+          <span className="badge badge-resolved">Done</span>
         )}
       </td>
     </tr>

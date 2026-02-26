@@ -541,9 +541,9 @@ body {
 }
 
 .cell-actions {
-  display: flex;
-  gap: 0.375rem;
-  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 5.5rem;
 }
 
 .text-muted {
