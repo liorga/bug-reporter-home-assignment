@@ -44,7 +44,7 @@ const ReportRow = React.memo(function ReportRow({
       <td className="cell-actions">
         {report.status === 'NEW' && (
           <button
-            className="btn btn-sm btn-primary"
+            className="btn btn-sm btn-outline-primary"
             disabled={isUpdating}
             onClick={() => onUpdateStatus(report.id, 'APPROVED')}
           >
@@ -53,7 +53,7 @@ const ReportRow = React.memo(function ReportRow({
         )}
         {report.status === 'APPROVED' && (
           <button
-            className="btn btn-sm btn-success"
+            className="btn btn-sm btn-outline-success"
             disabled={isUpdating}
             onClick={() => onUpdateStatus(report.id, 'RESOLVED')}
           >
@@ -94,7 +94,7 @@ const MobileCard = React.memo(function MobileCard({
       <div className="report-card-actions">
         {report.status === 'NEW' && (
           <button
-            className="btn btn-sm btn-primary"
+            className="btn btn-sm btn-outline-primary"
             disabled={isUpdating}
             onClick={() => onUpdateStatus(report.id, 'APPROVED')}
           >
@@ -103,7 +103,7 @@ const MobileCard = React.memo(function MobileCard({
         )}
         {report.status === 'APPROVED' && (
           <button
-            className="btn btn-sm btn-success"
+            className="btn btn-sm btn-outline-success"
             disabled={isUpdating}
             onClick={() => onUpdateStatus(report.id, 'RESOLVED')}
           >
