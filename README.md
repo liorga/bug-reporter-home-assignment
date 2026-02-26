@@ -36,9 +36,10 @@ bug-reporter-starter/
 │       │   └── client.ts            # Centralized fetch-based API client
 │       ├── components/              # Shared UI components
 │       │   ├── AppRoutes.tsx        # Route definitions
-│       │   ├── NavBar.tsx           # Navigation bar
+│       │   ├── NavBar.tsx           # Sticky navigation bar
 │       │   ├── LogoutButton.tsx     # Logout action component
-│       │   └── StatusBadge.tsx      # Reusable status badge
+│       │   ├── StatusBadge.tsx      # Reusable status badge
+│       │   └── index.ts            # Barrel export
 │       ├── features/
 │       │   ├── auth/                # Authentication module
 │       │   │   ├── models/          # UserStatus, AuthUser, AuthState types
@@ -47,13 +48,13 @@ bug-reporter-starter/
 │       │   │   └── ProtectedRoute.tsx
 │       │   ├── reports/             # Bug report submission module
 │       │   │   ├── constants/       # File type & size constraints
-│       │   │   ├── ReportForm.tsx   # Form (React Hook Form + Zod)
+│       │   │   ├── ReportForm.tsx   # Form with validation + screenshot capture
 │       │   │   ├── ReportPage.tsx   # Report page wrapper
 │       │   │   └── reportSchema.ts  # Zod validation schema
 │       │   └── admin/               # Admin dashboard module
 │       │       ├── constants/       # Query keys, table column defs
 │       │       ├── ReportsPage.tsx  # Admin page (loading/error/empty)
-│       │       ├── ReportsTable.tsx # Desktop table + mobile cards
+│       │       ├── ReportsTable.tsx # Desktop table + mobile cards + downloadable attachments
 │       │       ├── TableSkeleton.tsx
 │       │       └── useReports.ts    # TanStack Query hook
 │       ├── types/
@@ -82,6 +83,7 @@ bug-reporter-starter/
 | React Hook Form + Zod | Form state management + schema-driven validation |
 | TanStack Query | Server-state management (caching, refetch, mutations) |
 | React Router v6 | Client-side routing with protected routes |
+| html2canvas | In-browser screenshot capture for bug report attachments |
 | Multer | Server-side multipart file upload handling |
 
 ---
