@@ -5,10 +5,14 @@ A production-grade bug reporting platform built with React, TypeScript, and Expr
 ## Quick Start
 
 ```bash
-# 1. Install all dependencies (client + server, via workspaces)
+# 1. Clone the repository
+git clone https://github.com/liorga/bug-reporter-home-assignment.git
+cd bug-reporter-home-assignment
+
+# 2. Install all dependencies (client + server, via workspaces)
 npm install
 
-# 2. Run both client and server concurrently
+# 3. Run both client and server concurrently
 npm run dev
 ```
 
