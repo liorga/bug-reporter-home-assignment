@@ -20,36 +20,45 @@ export function LoginPage() {
   };
 
   return (
-    <div className="page">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit} className="form">
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-            disabled={isLoading}
-          />
+    <div className="login-wrapper">
+      <div className="page login-card">
+        <div className="login-header">
+          <span className="login-icon">🐛</span>
+          <h1>Welcome to Bug Reporter</h1>
+          <p className="login-subtitle">Sign in to submit and track bug reports</p>
         </div>
 
-        {error && (
-          <div className="form-error" role="alert">
-            {error}
+        <form onSubmit={handleSubmit} className="form">
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              disabled={isLoading}
+              autoFocus
+            />
           </div>
-        )}
 
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isLoading || !email.trim()}
-        >
-          {isLoading ? 'Checking…' : 'Login'}
-        </button>
-      </form>
+          {error && (
+            <div className="form-error" role="alert">
+              <span className="form-error-icon">⚠️</span>
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isLoading || !email.trim()}
+          >
+            {isLoading ? 'Checking…' : 'Sign In'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
