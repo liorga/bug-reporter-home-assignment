@@ -4,6 +4,8 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { formatDate } from '../../utils/formatDate';
 import { TABLE_COLUMNS } from './constants/index';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+
 interface ReportsTableProps {
   reports: Report[];
   onUpdateStatus: (reportId: string, status: 'APPROVED' | 'RESOLVED') => void;
@@ -36,7 +38,15 @@ const ReportRow = React.memo(function ReportRow({
       </td>
       <td className="cell-attachment">
         {report.attachmentFilename ? (
-          <span title={report.attachmentFilename}>📎 {report.attachmentFilename}</span>
+          <a
+            href={`${API_BASE}${report.attachmentUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="attachment-link"
+            title={`Open ${report.attachmentFilename}`}
+          >
+            📎 {report.attachmentFilename}
+          </a>
         ) : (
           '—'
         )}
@@ -89,7 +99,16 @@ const MobileCard = React.memo(function MobileCard({
         <span>{formatDate(report.createdAt)}</span>
       </div>
       {report.attachmentFilename && (
-        <div className="report-card-attachment">📎 {report.attachmentFilename}</div>
+        <div className="report-card-attachment">
+          <a
+            href={`${API_BASE}${report.attachmentUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="attachment-link"
+          >
+            📎 {report.attachmentFilename}
+          </a>
+        </div>
       )}
       <div className="report-card-actions">
         {report.status === 'NEW' && (
