@@ -9,13 +9,6 @@ export function NavBar() {
     <nav className="nav">
       <div className="nav-brand">🐛 Bug Reporter</div>
       <ul className="nav-links">
-        {!isAuthenticated && (
-          <li>
-            <NavLink to="/login" className={({ isActive }) => isActive ? 'active' : ''}>
-              Login
-            </NavLink>
-          </li>
-        )}
         {isAuthenticated && (
           <li>
             <NavLink to="/report" className={({ isActive }) => isActive ? 'active' : ''}>
