@@ -266,6 +266,19 @@ body {
   text-decoration: underline;
 }
 
+/* Attachment row: file input + screenshot button side by side */
+.attachment-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-capture {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* Wide page variant (admin table) — override both the page and its .main parent */
 .page-wide {
   max-width: none;

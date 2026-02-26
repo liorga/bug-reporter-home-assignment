@@ -48,7 +48,7 @@ With that in mind, I focused on delivering **all required items to a production-
 
 | Feature | Why Deferred | Effort | Would Implement Next? |
 |---------|-------------|--------|----------------------|
-| **Screenshot capture (bonus)** | Optional bonus. Requires `html2canvas` or similar, plus canvas-to-blob conversion. Medium effort with limited impact on core evaluation criteria. | ~3–4 hours | Yes — P1 for next iteration |
+| ~~Screenshot capture (bonus)~~ | **Implemented.** Users can capture a screenshot directly from the report form and attach it as a PNG. Uses `html2canvas`. | ~1 hour | Done |
 | **"My Reports" list for standard users** | Listed in system overview as a user responsibility, but not in the explicit requirements checklist. Would require a new page + filtered API call or client-side filtering by email. | ~2–3 hours | Yes — P0 for production |
 | **Persistent authentication (JWT/sessions)** | Current in-memory auth is sufficient for the assignment scope. Real auth would require server-side sessions, token refresh, and secure cookie handling. | ~6–8 hours | P0 for production |
 | **Database storage** | In-memory arrays work for demo. A real deployment needs PostgreSQL/SQLite with migrations. | ~4–6 hours | P0 for production |

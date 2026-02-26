@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import html2canvas from 'html2canvas';
 import { reportSchema, type ReportFormValues } from './reportSchema';
 import { apiClient } from '../../api/client';
 import { ISSUE_TYPES, type Report } from '../../types/Report';
@@ -9,6 +10,7 @@ export function ReportForm() {
   const [submitResult, setSubmitResult] = useState<
     { kind: 'success'; report: Report } | { kind: 'error'; message: string } | null
   >(null);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +45,37 @@ export function ReportForm() {
       fileInputRef.current.value = '';
     }
   };
+
+  const captureScreenshot = useCallback(async () => {
+    setIsCapturing(true);
+    try {
+      const canvas = await html2canvas(document.body, {
+        useCORS: true,
+        scale: window.devicePixelRatio,
+      });
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, 'image/png'),
+      );
+
+      if (!blob) throw new Error('Failed to create screenshot');
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const file = new File([blob], `screenshot-${timestamp}.png`, {
+        type: 'image/png',
+      });
+
+      setValue('attachment', file, { shouldValidate: true });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch {
+      setSubmitResult({
+        kind: 'error',
+        message: 'Screenshot capture failed. Try uploading a file instead.',
+      });
+    } finally {
+      setIsCapturing(false);
+    }
+  }, [setValue]);
 
   const onSubmit = async (data: ReportFormValues) => {
     setSubmitResult(null);
@@ -113,14 +146,24 @@ export function ReportForm() {
 
       <div className="form-group">
         <label htmlFor="attachment">Attachment (optional)</label>
-        <input
-          id="attachment"
-          ref={fileInputRef}
-          type="file"
-          accept=".png,.jpg,.jpeg,.pdf"
-          onChange={onFileChange}
-        />
-        <span className="form-hint">PNG, JPG, or PDF — max 5 MB</span>
+        <div className="attachment-actions">
+          <input
+            id="attachment"
+            ref={fileInputRef}
+            type="file"
+            accept=".png,.jpg,.jpeg,.pdf"
+            onChange={onFileChange}
+          />
+          <button
+            type="button"
+            className="btn btn-sm btn-secondary btn-capture"
+            onClick={captureScreenshot}
+            disabled={isCapturing}
+          >
+            {isCapturing ? 'Capturing…' : '📸 Capture Screenshot'}
+          </button>
+        </div>
+        <span className="form-hint">Upload a file (PNG, JPG, PDF — max 5 MB) or capture a screenshot</span>
 
         {selectedFile && (
           <div className="file-preview">
