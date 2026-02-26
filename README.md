@@ -140,27 +140,50 @@ Additionally, the Admin Reports table was optimized:
 
 ---
 
-## Prioritized Features & Future Roadmap
+## Stats Page Approach
 
-### Implemented (v1.0)
+> Full details in [`STATS_PAGE_APPROACH.md`](./STATS_PAGE_APPROACH.md)
 
-1. **Authentication & Authorization** — Email-based login, role detection (allowed/admin/blacklisted), `ProtectedRoute` guard.
-2. **Bug Report Form** — Dropdown issue type, Zod validation, inline errors, file upload (PNG/JPG/PDF, 5MB), submit loading state.
-3. **Admin Dashboard** — TanStack Query data fetching, Loading/Error/Empty states, Approve & Resolve actions with optimistic UI refresh.
-4. **Performance Fix** — Removed render-path bottleneck, memoized table rows.
-5. **Responsive Design** — Mobile-first nav, form, and table-to-card transformation at 768px breakpoint.
+**Metrics:** Total reports, open backlog, average resolution time, approval rate, and top reporters — displayed as summary KPI cards at the top, with five charts below (reports over time, by issue type, status breakdown, resolution time distribution, top reporters).
+
+**Library:** [Recharts](https://recharts.org/) — a React-native composable charting library. Chosen over Chart.js (imperative API fights React's model) and D3 (overkill for standard chart types). Recharts provides declarative components (`<LineChart>`, `<PieChart>`) with built-in responsive containers.
+
+**Implementation:** A new `features/stats/` module with a `useStats` TanStack Query hook. Start with client-side aggregation over `GET /api/reports`, then migrate to a dedicated `GET /api/stats` endpoint when report volume grows. Admin-only access via the existing `ProtectedRoute`. Date range and issue type filters managed at the page level.
+
+---
+
+## Next Steps & Prioritization
+
+> Full details in [`PRIORITIZATION.md`](./PRIORITIZATION.md)
+
+### What I Prioritized (and Why)
+
+I focused on delivering **all required checklist items** to production quality before touching bonus features:
+
+1. **Auth & Authorization** (P0) — Foundation for every other feature.
+2. **Bug Report Form** (P0) — Primary user-facing workflow. React Hook Form + Zod for modern validation.
+3. **Admin Dashboard** (P0) — Completes the admin workflow. TanStack Query for proper server-state management.
+4. **Performance Fix** (P0) — Explicitly required. Identified `validateField` bottleneck (2M ops/render), replaced with schema-driven validation.
+5. **Responsive Design** (Bonus) — High UX impact for low effort. Table-to-cards, mobile nav, form stacking.
+6. **Screenshot Capture** (Bonus) — `html2canvas` integration for in-browser screenshot attachment.
+
+### What I Deferred
+
+| Feature | Reason | Next? |
+|---------|--------|-------|
+| "My Reports" list for standard users | Not in checklist; listed in system overview | P0 for production |
+| Persistent auth (JWT/sessions) | In-memory sufficient for demo scope | P0 for production |
+| Database storage | In-memory arrays work for demo | P0 for production |
+| Search & filtering | Needed at scale, not for current dataset | P1 |
+| Pagination | Same — needed at scale | P1 |
+| E2E tests | Assignment doesn't require testing | P1 |
+| Stats page implementation | Assignment says "no implementation required" | P1 |
 
 ### Future Roadmap
 
-| Priority | Feature | Details |
-|----------|---------|---------|
-| P0 | Persistent authentication | JWT or session-based auth with server-side tokens (currently in-memory only) |
-| P0 | Persistent storage | Replace in-memory arrays with a database (PostgreSQL / SQLite) |
-| P1 | Search & filtering | Filter reports by status, issue type, date range; full-text search on description |
-| P1 | Pagination | Server-side pagination for the reports list to handle scale |
-| P1 | Real-time updates | WebSocket or SSE so the admin dashboard updates without manual refresh |
-| P2 | Dark mode | Theme toggle using CSS custom properties (the design already uses CSS variables) |
-| P2 | E2E tests | Playwright or Cypress test suite covering login, form submission, and admin actions |
-| P2 | Accessibility audit | Full WCAG 2.1 AA compliance, screen reader testing, keyboard navigation |
-| P3 | Export reports | CSV/PDF export of filtered report data for stakeholders |
-| P3 | Notification system | Email or in-app notifications when a report status changes |
+| Phase | Timeline | Features |
+|-------|----------|----------|
+| **Phase 1** | Week 1–2 | JWT auth, PostgreSQL, "My Reports" page, screenshot capture polish |
+| **Phase 2** | Week 3–4 | Stats page (Recharts), search/filtering, pagination, E2E tests |
+| **Phase 3** | Week 5–6 | Real-time updates (WebSocket), dark mode, accessibility audit |
+| **Phase 4** | Week 7+ | CSV/PDF export, audit log, i18n |
